@@ -29,44 +29,44 @@
         {
             "id": 1,
             "mode": "js",
-            "value": "function graphFunction(hc) {\r\n    const d = {};\r\n    d.points = [];\r\n    // try {\r\n    //     d.selected = data.selected;\r\n    // } catch(err) {\r\n        d.selected = 0;\r\n    // }\r\n    for (let x = minOutdoorTemperature; x <= targetTemperature; x = x + 0.02) {\r\n        var y = targetTemperature + (2.8 * hc**0.8) * (targetTemperature - x)**0.75;\r\n        d.points.push([x, y])\r\n    }\r\n    return d;\r\n}",
+            "value": "function graphFunction(hc) {\r\n    const d = {};\r\n    d.points = [];\r\n    // try {\r\n    //     d.selected = data.selected;\r\n    // } catch(err) {\r\n        d.selected = 0;\r\n    // }\r\n    for (let x = minOutdoorTemperature; x <= targetTemperature; x = x + 0.02) {\r\n        // var y = targetTemperature + (2.8 * hc**0.8) * (targetTemperature - x)**0.75;\r\n        var y = 2.55 * (hc * (targetTemperature - x))**0.78 + targetTemperature;\r\n        d.points.push([x, y])\r\n    }\r\n    return d;\r\n}",
             "start": 52,
-            "end": 454
+            "end": 539
         },
         {
             "id": 2,
             "mode": "js",
             "value": "viewof heatCurve = slider({\r\n    title: 'Heat Curve',\r\n    value: 0.6,\r\n    min: 0.1,\r\n    max: 4.0,\r\n    step: 0.05\r\n})",
-            "start": 458,
-            "end": 578
+            "start": 543,
+            "end": 663
         },
         {
             "id": 3,
             "mode": "js",
             "value": "viewof targetTemperature = slider({\r\n    title: 'Target Temperature',\r\n    value: 20.0,\r\n    min: 10.0,\r\n    max: 30.0,\r\n    step: 0.5\r\n})",
-            "start": 582,
-            "end": 720
+            "start": 667,
+            "end": 805
         },
         {
             "id": 4,
             "mode": "js",
             "value": "viewof maxFlowTemperature = slider({\r\n    title: 'Max Flow Temperature',\r\n    value: 35.0,\r\n    min: 15.0,\r\n    max: 90.0,\r\n    step: 5.0\r\n})",
-            "start": 724,
-            "end": 865
+            "start": 809,
+            "end": 950
         },
         {
             "id": 5,
             "mode": "js",
             "value": "viewof minOutdoorTemperature = slider({\r\n    title: 'Min Outdoor Temperature',\r\n    value: 0.0,\r\n    min: -20.0,\r\n    max: 20.0,\r\n    step: 1.0\r\n})",
-            "start": 869,
-            "end": 1016
+            "start": 954,
+            "end": 1101
         },
         {
             "id": 6,
             "mode": "js",
             "value": "chart = {\r\n\r\n    const width = 860;\r\n    const height = 660;\r\n    const marginTop = 20;\r\n    const marginRight = 20;\r\n    const marginBottom = 40;\r\n    const marginLeft = 40;\r\n\r\n    const xDomain = [targetTemperature, minOutdoorTemperature];\r\n    const yDomain = [targetTemperature, maxFlowTemperature];\r\n    const xScale = d3.scaleLinear().domain(xDomain).range([marginLeft, width - marginRight]);\r\n    const yScale = d3.scaleLinear().domain(yDomain).range([height - marginBottom, marginTop]);\r\n    const xAxis = d3.axisBottom(xScale).ticks(width / 80);\r\n    const yAxis = d3.axisLeft(yScale).ticks(height / 40);\r\n\r\n    const line = d3.line().x(d => xScale(d[0])).y(d => yScale(d[1]));\r\n\r\n    const svg = d3.create(\"svg\")\r\n        .attr(\"width\", width)\r\n        .attr(\"height\", height)\r\n        .on(\"pointerenter pointermove\", pointermoved)\r\n        .on(\"pointerleave\", pointerleft)\r\n        .on(\"click\", toggleActive)\r\n        .on(\"touchstart\", event => event.preventDefault());\r\n\r\n    var data = graphFunction(heatCurve);\r\n\r\n    svg.append(\"g\")\r\n        .attr(\"transform\", `translate(0,${height - marginBottom})`)\r\n        .call(xAxis)\r\n        .call(g => g.selectAll(\".tick line\").clone().attr(\"y2\", 0 - height + marginTop + marginBottom).attr(\"stroke-opacity\", 0.1))\r\n        .call(g => g.append(\"text\").attr(\"x\", width).attr(\"y\", 30).attr(\"fill\", \"currentColor\").attr(\"text-anchor\", \"end\").text(\"Outdoor temperature\"));\r\n\r\n    svg.append(\"g\")\r\n        .attr(\"transform\", `translate(${marginLeft},0)`)\r\n        .call(yAxis)\r\n        .call(g => g.selectAll(\".tick line\").clone().attr(\"x2\", width - marginLeft - marginRight).attr(\"stroke-opacity\", 0.1))\r\n        .call(g => g.append(\"text\").attr(\"x\", -marginLeft).attr(\"y\", 10).attr(\"fill\", \"currentColor\").attr(\"text-anchor\", \"start\").text(\"Flow Temperature\"));\r\n\r\n    svg.append('g').append('text').attr(\"fill\", \"currentColor\").attr('x', width - marginRight-10).attr('y', 50).attr(\"text-anchor\", \"end\").attr(\"font-size\", \"2em\").attr(\"font-style\", \"italic\").text(\"HC = \" + heatCurve);\r\n\r\n    svg.append(\"defs\").append(\"svg:clipPath\")\r\n        .attr(\"id\", \"clip\")\r\n        .append(\"svg:rect\")\r\n        .attr(\"width\", width - marginLeft - marginRight)\r\n        .attr(\"height\", height - marginBottom - marginTop)\r\n        .attr(\"x\", marginLeft)\r\n        .attr(\"y\", marginTop);\r\n\r\n    svg.append(\"path\")\r\n        .datum(data.points)\r\n        .attr(\"clip-path\", \"url(#clip)\")\r\n        .attr(\"fill\", \"none\")\r\n        .attr(\"stroke\", \"steelblue\")\r\n        .attr(\"stroke-width\", 1.5)\r\n        .attr(\"d\", line);\r\n\r\n    var active = true;\r\n\r\n    var focus = svg.append('g');\r\n    focus.append('line').attr('id', 'focusLineX').attr('stroke', 'steelblue').attr('stroke-width', '0.5px');\r\n    focus.append('line').attr('id', 'focusLineY').attr('stroke', 'steelblue').attr('stroke-width', '0.5px');\r\n    focus.append('circle').attr('id', 'focusCircle').attr('r', 5).attr('fill', 'steelblue');\r\n    focus.append(\"text\").attr('id', 'focusTexty').attr(\"fill\", \"currentColor\").attr(\"x\", 9).attr(\"dy\", \".35em\");\r\n    focus.append(\"text\").attr('id', 'focusTextx').attr(\"fill\", \"currentColor\").attr(\"x\", 9).attr(\"dy\", \".35em\");\r\n\r\n    var bisectX = d3.bisector(function(d) { return d[0]; }).left;\r\n    function focusPoint() {\r\n        var d = data.points[data.selected];\r\n        var cx = xScale(d[0]), cy = yScale(d[1]);\r\n        var MIN = 0, MAX = 1;\r\n        focus.select('#focusCircle').attr('cx', cx).attr('cy', cy);\r\n        focus.select('#focusLineX').attr('x1', cx).attr('y1', yScale(yDomain[MIN])).attr('x2', cx).attr('y2', yScale(yDomain[MAX]));\r\n        focus.select('#focusLineY').attr('x1', xScale(xDomain[MIN])).attr('y1', cy).attr('x2', xScale(xDomain[MAX])).attr('y2', cy);\r\n        focus.select(\"#focusTexty\").attr(\"transform\", \"translate(\" + xScale(xDomain[MIN]) + \",\" + (cy - 10) + \")\").text(d[1].toFixed(1));\r\n        focus.select(\"#focusTextx\").attr(\"transform\", \"translate(\" + cx + \",\" + (yScale(yDomain[MIN]) - 10) + \")\").text(d[0].toFixed(1));\r\n    }\r\n\r\n    function pointermoved(event) {\r\n        if (active) {\r\n            data.selected = bisectX(data.points, xScale.invert(d3.pointer(event)[0]))\r\n            focusPoint();\r\n        }\r\n    }\r\n    function pointerleft() { }\r\n    function toggleActive() {\r\n        active = !active;\r\n    }\r\n\r\n    return svg.node();\r\n}",
-            "start": 1020,
-            "end": 5346
+            "start": 1105,
+            "end": 5431
         }
     ]
 };
